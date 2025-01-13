@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import requests
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -70,21 +71,15 @@ def brave_search():
         }
 
         # Make the request
+        print("Request Parameters:", params)
         response = requests.get(api_url, params=params, headers=headers, proxies=None)
         response.raise_for_status()
         
         # Process the response
         data = response.json()
-
-        if data.get('results') and len(data['results']) > 0:
-            formatted_results = [
-                f"Title: {item.get('title', 'N/A')}\nURL: {item.get('url', 'N/A')}\nDescription: {item.get('description', 'N/A')}"
-                for item in data['results']
-            ]
-            
-            return jsonify({'results': '\n\n'.join(formatted_results)})
-        else:
-            return jsonify({'results': 'No results found.'})
+        
+        # Return the raw JSON response
+        return jsonify(data)
 
     except requests.exceptions.RequestException as e:
         return jsonify({'error': f'Request error: {str(e)}'}), 500
