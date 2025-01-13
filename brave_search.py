@@ -27,7 +27,7 @@ def brave_search():
         # Validate required parameters
         api_key = data.get('braveSearchAPIKey')
         query = data.get('q')
-
+        
         if not api_key:
             return jsonify({'error': 'Brave Search API Key is required'}), 400
         if not query:
@@ -36,24 +36,32 @@ def brave_search():
         # Construct API URL with careful parameter handling
         params = {
             'q': query,
-            'offset': data.get('offset'),
-            'freshness': data.get('freshness'),
-            'result_filter': data.get('result_filter'),
-            'country': data.get('country'),
-            'search_lang': data.get('searchLang'),
-            'ui_lang': data.get('uiLang'),
-            'count': data.get('count'),
-            'safesearch': data.get('safesearch'),
-            'goggles_id': data.get('gogglesId'),
-            'units': data.get('units')
         }
+        if data.get('offset'):
+            params['offset'] = data.get('offset')
+        if data.get('freshness'):
+            params['freshness'] = data.get('freshness')
+        if data.get('result_filter'):
+            params['result_filter'] = data.get('result_filter')
+        if data.get('country'):
+            params['country'] = data.get('country')
+        if data.get('searchLang'):
+            params['search_lang'] = data.get('searchLang')
+        if data.get('uiLang'):
+            params['ui_lang'] = data.get('uiLang')
+        if data.get('count'):
+            params['count'] = data.get('count')
+        if data.get('safesearch'):
+            params['safesearch'] = data.get('safesearch')
+        if data.get('gogglesId'):
+            params['goggles_id'] = data.get('gogglesId')
+        if data.get('units'):
+            params['units'] = data.get('units')
 
-        # Remove None values
-        params = {k: v for k, v in params.items() if v is not None}
 
         # Construct API URL
         api_url = 'https://api.search.brave.com/res/v1/web/search'
-
+        
         headers = {
             'Accept': 'application/json',
             'Accept-Encoding': 'gzip',
@@ -63,7 +71,7 @@ def brave_search():
         # Make the request
         response = requests.get(api_url, params=params, headers=headers, proxies=None)
         response.raise_for_status()
-
+        
         # Process the response
         data = response.json()
 
@@ -72,7 +80,7 @@ def brave_search():
                 f"Title: {item.get('title', 'N/A')}\nURL: {item.get('url', 'N/A')}\nDescription: {item.get('description', 'N/A')}"
                 for item in data['results']
             ]
-
+            
             return jsonify({'results': '\n\n'.join(formatted_results)})
         else:
             return jsonify({'results': 'No results found.'})
