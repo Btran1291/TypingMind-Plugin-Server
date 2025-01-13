@@ -37,25 +37,25 @@ def brave_search():
         params = {
             'q': query,
         }
-        if data.get('offset'):
+        if data.get('offset') and data.get('offset') != "":
             params['offset'] = data.get('offset')
-        if data.get('freshness'):
+        if data.get('freshness') and data.get('freshness') != "":
             params['freshness'] = data.get('freshness')
-        if data.get('result_filter'):
+        if data.get('result_filter') and data.get('result_filter') != "":
             params['result_filter'] = data.get('result_filter')
-        if data.get('country'):
+        if data.get('country') and data.get('country') != "":
             params['country'] = data.get('country')
-        if data.get('searchLang'):
+        if data.get('searchLang') and data.get('searchLang') != "":
             params['search_lang'] = data.get('searchLang')
-        if data.get('uiLang'):
+        if data.get('uiLang') and data.get('uiLang') != "":
             params['ui_lang'] = data.get('uiLang')
-        if data.get('count'):
+        if data.get('count') and data.get('count') != "":
             params['count'] = data.get('count')
-        if data.get('safesearch'):
+        if data.get('safesearch') and data.get('safesearch') != "":
             params['safesearch'] = data.get('safesearch')
-        if data.get('gogglesId'):
+        if data.get('gogglesId') and data.get('gogglesId') != "":
             params['goggles_id'] = data.get('gogglesId')
-        if data.get('units'):
+        if data.get('units') and data.get('units') != "":
             params['units'] = data.get('units')
 
 
