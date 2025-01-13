@@ -33,31 +33,32 @@ def brave_search():
         if not query:
             return jsonify({'error': 'Search query is required'}), 400
 
+        # Function to check if a parameter should be included
+        def is_valid_param(param):
+            return param and param != "" and not param.startswith("{") and not param.endswith("}")
+
         # Construct API URL with careful parameter handling
         params = {
             'q': query,
         }
-        if data.get('offset') and data.get('offset') != "":
-            params['offset'] = data.get('offset')
-        if data.get('freshness') and data.get('freshness') != "":
-            params['freshness'] = data.get('freshness')
-        if data.get('result_filter') and data.get('result_filter') != "":
-            params['result_filter'] = data.get('result_filter')
-        if data.get('country') and data.get('country') != "":
-            params['country'] = data.get('country')
-        if data.get('searchLang') and data.get('searchLang') != "":
-            params['search_lang'] = data.get('searchLang')
-        if data.get('uiLang') and data.get('uiLang') != "":
-            params['ui_lang'] = data.get('uiLang')
-        if data.get('count') and data.get('count') != "":
-            params['count'] = data.get('count')
-        if data.get('safesearch') and data.get('safesearch') != "":
-            params['safesearch'] = data.get('safesearch')
-        if data.get('gogglesId') and data.get('gogglesId') != "":
-            params['goggles_id'] = data.get('gogglesId')
-        if data.get('units') and data.get('units') != "":
-            params['units'] = data.get('units')
 
+        # Only add parameters if they have valid values
+        param_mapping = {
+            'offset': ('offset', data.get('offset')),
+            'freshness': ('freshness', data.get('freshness')),
+            'result_filter': ('result_filter', data.get('result_filter')),
+            'country': ('country', data.get('country')),
+            'search_lang': ('search_lang', data.get('searchLang')),
+            'ui_lang': ('ui_lang', data.get('uiLang')),
+            'count': ('count', data.get('count')),
+            'safesearch': ('safesearch', data.get('safesearch')),
+            'goggles_id': ('goggles_id', data.get('gogglesId')),
+            'units': ('units', data.get('units'))
+        }
+
+        for api_param, (param_name, value) in param_mapping.items():
+            if is_valid_param(value):
+                params[api_param] = value
 
         # Construct API URL
         api_url = 'https://api.search.brave.com/res/v1/web/search'
