@@ -26,17 +26,21 @@ def vectorize_rag_retrieve():
         retrieval_endpoint_url = data.get('retrievalEndpointURL')
         question = data.get('question')
         
-        # Get num_results and default to 5 if it's None or not provided
-        num_results = data.get('numResults', 5)
-        
-        try:
-            num_results = int(num_results)
-        except ValueError:
-            num_results = 5  # Default to 5 if not a valid number
-        
+        # Get num_results and handle all edge cases
+num_results = data.get('numResults')
+
+if not num_results:
+    num_results = 5
+else:
+    try:
+        num_results = int(num_results)
+        if num_results <= 0:
+            num_results = 5
+    except ValueError:
+        num_results = 5
+
         rerank = data.get('rerank', True)
         
-        # Validate required parameters
         if not access_token or not retrieval_endpoint_url:
             return jsonify({
                 "error": "Missing access token or retrieval endpoint URL"
