@@ -5,7 +5,7 @@ This repository contains the backend server code for some of my TypingMind plugi
 2. [Vectorize Query](https://cloud.typingmind.com/plugins/p-01JJCGNM7F44Z2ZHV0J6A7M13T)
 3. [DOCX Generator](https://cloud.typingmind.com/plugins/p-01JJCGQ73XE44DEVE3K2TMKBFZ)
 
-## Hot to deploy to Render.com
+## How to deploy to Render.com
 
 1.  **Create a New Web Service on Render:**
     *   Go to the [Render Dashboard](https://dashboard.render.com/) and log in.
