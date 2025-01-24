@@ -1,6 +1,6 @@
 # TypingMind Plugin Server 🚀
 
-This repository contains the backend server code for my custom TypingMind plugins. Currently, it contains the following plugins:
+This repository contains the backend server code for some of my TypingMind plugins. Currently, it contains the following plugins:
 1. [Brave Search](https://cloud.typingmind.com/plugins/p-01JJCGC81N52X6W2RTQ6A46R1Z)
 2. [Vectorize Query](https://cloud.typingmind.com/plugins/p-01JJCGNM7F44Z2ZHV0J6A7M13T)
 3. [DOCX Generator](https://cloud.typingmind.com/plugins/p-01JJCGQ73XE44DEVE3K2TMKBFZ)
