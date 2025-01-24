@@ -1,3 +1,4 @@
+---
 services:
   - type: web
     name: typingmind-plugin-server
