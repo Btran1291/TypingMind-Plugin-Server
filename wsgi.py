@@ -11,7 +11,7 @@ if project_home not in sys.path:
 from brave_search import app as brave_search_app
 
 # Import the vectorize_rag app
-from vectorize_rag.vectorize_query import app as vectorize_rag_app
+from vectorize_query import app as vectorize_rag_app
 
 # Create a dispatcher middleware to route requests
 application = DispatcherMiddleware(Response('Not Found', status=404), {
