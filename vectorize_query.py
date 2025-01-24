@@ -25,15 +25,15 @@ def vectorize_rag_retrieve():
         access_token = data.get('accessToken')
         retrieval_endpoint_url = data.get('retrievalEndpointURL')
         question = data.get('question')
-        num_results = data.get('numResults')
-        if num_results is None or num_results == 0:
-            num_results = 5
-        else:
-            try:
-                num_results = int(num_results)
-            except ValueError:
-                num_results = 5
-                
+        
+        # Get num_results and default to 5 if it's None or not provided
+        num_results = data.get('numResults', 5)
+        
+        try:
+            num_results = int(num_results)
+        except ValueError:
+            num_results = 5  # Default to 5 if not a valid number
+        
         rerank = data.get('rerank', True)
         
         # Validate required parameters
