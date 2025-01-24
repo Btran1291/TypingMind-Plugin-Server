@@ -30,22 +30,6 @@ def brave_search():
         if not query:
             return jsonify({'error': 'Search query is required'}), 400
 
-        def is_valid_param(param):
-            if param is None:
-                return False
-    
-            if isinstance(param, (int, float)):
-                return param != 0
-    
-            if isinstance(param, str):
-                return (
-                    param != "" and 
-                    not param.startswith("{") and 
-                    not param.endswith("}")
-                )
-    
-            return False
-
         params = {
             'q': query,
         }
@@ -61,9 +45,9 @@ def brave_search():
             'goggles_id': ('goggles_id', data.get('gogglesId')),
             'units': ('units', data.get('units'))
         }
-
+        
         for api_param, (param_name, value) in param_mapping.items():
-            if is_valid_param(value):
+            if value is not None:
                 params[api_param] = value
 
         api_url = 'https://api.search.brave.com/res/v1/web/search'
