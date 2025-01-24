@@ -31,25 +31,29 @@ def brave_search():
             return jsonify({'error': 'Search query is required'}), 400
 
         def is_valid_param(param):
+            # Return False for None or empty values
             if param is None:
                 return False
-    
-            if isinstance(param, (int, float)):
-                return param != 0
-    
-            if isinstance(param, str):
-                return (
-                    param != "" and 
-                    not param.startswith("{") and 
-                    not param.endswith("}")
-                )
-    
-            return False
+                
+            # Convert to string for checking
+            param_str = str(param)
+            
+            # Return False for empty strings or template literals
+            if (param_str.strip() == "" or 
+                param_str.startswith("{") or 
+                param_str.endswith("}") or
+                param_str == "undefined" or 
+                param_str == "null"):
+                return False
+                
+            return True
 
+        # Start with only the required parameter
         params = {
             'q': query,
         }
 
+        # Define optional parameters mapping
         param_mapping = {
             'offset': ('offset', data.get('offset')),
             'freshness': ('freshness', data.get('freshness')),
@@ -62,9 +66,19 @@ def brave_search():
             'units': ('units', data.get('units'))
         }
 
+        # Only add parameters that have valid values
         for api_param, (param_name, value) in param_mapping.items():
             if is_valid_param(value):
-                params[api_param] = value
+                # Convert to integer for numeric parameters
+                if api_param in ['count', 'offset']:
+                    try:
+                        value = int(value)
+                        if value > 0:  # Only add if positive
+                            params[api_param] = value
+                    except (ValueError, TypeError):
+                        continue
+                else:
+                    params[api_param] = value
 
         api_url = 'https://api.search.brave.com/res/v1/web/search'
         
