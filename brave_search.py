@@ -31,7 +31,20 @@ def brave_search():
             return jsonify({'error': 'Search query is required'}), 400
 
         def is_valid_param(param):
-            return param and param != "" and not param.startswith("{") and not param.endswith("}")
+            if param is None:
+                return False
+    
+            if isinstance(param, (int, float)):
+                return param != 0
+    
+            if isinstance(param, str):
+                return (
+                    param != "" and 
+                    not param.startswith("{") and 
+                    not param.endswith("}")
+                )
+    
+            return False
 
         params = {
             'q': query,
