@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__)
-CORS(app, resources={r"/brave_search": {"origins": "*"}})
+brave_search_bp = Blueprint('brave_search', __name__)
+CORS(brave_search_bp, resources={r"/brave_search": {"origins": "*"}})
 
-@app.route('/brave_search', methods=['OPTIONS', 'POST'])
+@brave_search_bp.route('/brave_search', methods=['OPTIONS', 'POST'])
 def brave_search():
     if request.method == 'OPTIONS':
         response = make_response()
