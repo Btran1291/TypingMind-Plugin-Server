@@ -26,7 +26,7 @@ def vectorize_rag_retrieve():
         retrieval_endpoint_url = data.get('retrievalEndpointURL')
         question = data.get('question')
         num_results = data.get('numResults')
-        if num_results is None:
+        if num_results is None or num_results == 0:
             num_results = 5
         else:
             try:
