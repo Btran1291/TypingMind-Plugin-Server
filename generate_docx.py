@@ -252,7 +252,7 @@ def generate_docx():
         generated_files[file_id] = temp_file_path
 
         # Generate the download link
-        download_link = url_for('download_file', file_id=file_id, _external=True)
+        download_link = url_for('generate_docx.download_file', file_id=file_id, _external=True)
 
         return jsonify({'download_link': download_link})
 
