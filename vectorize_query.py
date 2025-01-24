@@ -2,10 +2,10 @@ from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import requests
 
-app = Flask(__name__)
-CORS(app, resources={r"/vectorize-rag-retrieve": {"origins": "*"}})
+vectorize_query_bp = Blueprint('vectorize_query', __name__)
+CORS(vectorize_query_bp, resources={r"/vectorize-rag-retrieve": {"origins": "*"}})
 
-@app.route('/vectorize-rag-retrieve', methods=['OPTIONS', 'POST'])
+@vectorize_query_bp.route('/vectorize-rag-retrieve', methods=['OPTIONS', 'POST'])
 def vectorize_rag_retrieve():
     # Handle CORS preflight request
     if request.method == 'OPTIONS':
@@ -66,6 +66,3 @@ def vectorize_rag_retrieve():
         return jsonify({'error': f'Request error: {str(e)}'}), 500
     except Exception as e:
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
