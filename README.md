@@ -15,7 +15,7 @@ This repository contains the backend server code for some of my TypingMind plugi
 2.  **Configure Your Web Service:**
     *   **Name:** Enter a name for your web service (e.g., `typingmind-plugin-server`).
     *   **Language:** Select **"Python"**.
-    *   **Region:** Choose the region closest to your users.
+    *   **Region:** Choose the region closest to you.
     *   **Build Command:** Enter `pip install -r requirements.txt`.
     *   **Start Command:** Enter `gunicorn wsgi:application`.
     *   **Instance Type:** Choose the instance type that suits your needs (e.g., Free, Starter, etc.).
