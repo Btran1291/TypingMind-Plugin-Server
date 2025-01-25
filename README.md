@@ -10,7 +10,7 @@ This repository contains the backend server code for some of my TypingMind plugi
 1.  **Create a New Web Service on Render:**
     *   Go to the [Render Dashboard](https://dashboard.render.com/) and log in.
     *   Create a new Web Service.
-    *   Set your source code as Git repository and enter `https://github.com/Btran1291/TypingMind-Plugin-Server/` as the repo URL.
+    *   Set your source code as Public Git repository and enter `https://github.com/Btran1291/TypingMind-Plugin-Server/` as the repo URL.
 
 2.  **Configure Your Web Service:**
     *   **Name:** Enter a name for your web service (e.g., `typingmind-plugin-server`).
