@@ -48,7 +48,7 @@ async function handlePdfSelection(event) {
         const { chatId, model } = await getCurrentChatInfo();
         
         // Store in IndexedDB
-        const pdfData = await storePdfInDatabase(file.name, base64String, chatId, model);
+        await storePdfInDatabase(file.name, base64String, chatId, model);
         
         // Store a flag to indicate that the next message should include the PDF
         localStorage.setItem('pdfToAttach', chatId);
@@ -58,9 +58,6 @@ async function handlePdfSelection(event) {
         
         // Optional: Show success message
         showNotification(`PDF "${file.name}" stored successfully`);
-        
-        // Display the PDF indicator
-        displayPdfIndicator(pdfData);
     } catch (error) {
         console.error('Error handling PDF:', error);
         showNotification('Error storing PDF', 'error');
@@ -96,8 +93,7 @@ async function storePdfInDatabase(filename, base64String, chatId, model) {
     const db = await openDatabase();
     const transaction = db.transaction(['pdfs'], 'readwrite');
     const store = transaction.objectStore('pdfs');
-    const addRequest = await store.add(pdfData);
-    return { ...pdfData, id: addRequest };
+    await store.add(pdfData);
 }
 
 // Get current chat ID and model from TypingMind
@@ -196,7 +192,20 @@ async function interceptAndModifyApiCall(url, options) {
             // Modify the request body to include the PDF data
             try {
                 const requestBody = JSON.parse(options.body);
-                if (url.includes('api.anthropic.com')) {
+                if (url.includes('generativelanguage.googleapis.com')) {
+                    // Handle Gemini API
+                    requestBody.contents.push({
+                        "role": "user",
+                        "parts": [{
+                            "type": "document",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "application/pdf",
+                                "data": pdfData.base64String
+                            }
+                        }]
+                    });
+                } else if (url.includes('api.anthropic.com')) {
                    // Handle Anthropic Claude API
                     requestBody.messages.push({
                         "role": "user",
@@ -209,11 +218,11 @@ async function interceptAndModifyApiCall(url, options) {
                             }
                         }]
                     });
-                    options.body = JSON.stringify(requestBody);
                 } else {
                     console.warn("Unsupported API endpoint:", url);
                     return fetch(url, options); // Send original request
                 }
+                options.body = JSON.stringify(requestBody);
             } catch (error) {
                 console.error("Error modifying request body:", error);
             }
@@ -221,48 +230,6 @@ async function interceptAndModifyApiCall(url, options) {
     }
     // Send the original or modified request
     return fetch(url, options);
-}
-
-// Function to display PDF indicator
-function displayPdfIndicator(pdfData) {
-    const inputArea = document.querySelector('[data-element-id="chat-input-area"]');
-    if (!inputArea) return;
-
-    const indicator = document.createElement('div');
-    indicator.className = 'pdf-indicator';
-    indicator.style.cssText = `
-        display: inline-flex;
-        align-items: center;
-        background-color: #f0f0f0;
-        border-radius: 4px;
-        padding: 4px 8px;
-        margin-right: 8px;
-        margin-top: 4px;
-        font-size: 12px;
-        color: #333;
-    `;
-    indicator.innerHTML = `
-        <span style="margin-right: 4px;">📄</span>
-        <span>${pdfData.filename}</span>
-        <button class="delete-pdf-button" style="margin-left: 4px; background: none; border: none; cursor: pointer; color: #999;">x</button>
-    `;
-
-    // Add delete button handler
-    const deleteButton = indicator.querySelector('.delete-pdf-button');
-    deleteButton.addEventListener('click', async () => {
-        await deletePdfFromDatabase(pdfData.id);
-        indicator.remove();
-    });
-
-    inputArea.appendChild(indicator);
-}
-
-// Function to delete PDF from IndexedDB
-async function deletePdfFromDatabase(pdfId) {
-    const db = await openDatabase();
-    const transaction = db.transaction(['pdfs'], 'readwrite');
-    const store = transaction.objectStore('pdfs');
-    await store.delete(pdfId);
 }
 
 // Initialize extension
@@ -287,7 +254,7 @@ function initializeExtension() {
     // Modify the fetch function
     const originalFetch = window.fetch;
     window.fetch = async function(url, options) {
-      if (url.includes('api.anthropic.com')) {
+      if (url.includes('generativelanguage.googleapis.com') || url.includes('api.anthropic.com')) {
         return interceptAndModifyApiCall(url, options);
       } else {
         return originalFetch(url, options);
