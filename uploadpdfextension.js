@@ -204,19 +204,20 @@ async function interceptAndModifyApiCall(url, options) {
 
                 requestBody.messages.push({
                     "role": "user",
-                    "content": [{
-                        "type": "document",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "application/pdf",
-                            "data": pdfData.base64String
+                    "content": [
+                        {
+                            "type": "document",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "application/pdf",
+                                "data": pdfData.base64String
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "text": "Analyze this PDF."
                         }
-                    },
-                   {
-                        "type": "text",
-                        "text": "Analyze this PDF."
-                    }
-                ]
+                    ]
                 });
                 options.body = JSON.stringify(requestBody);
             } catch (error) {
@@ -233,7 +234,7 @@ function displayPdfIndicator(pdfData) {
     const inputArea = document.querySelector('[data-element-id="chat-input-area"]');
     if (!inputArea) return;
 
-    const indicator = document.createElement('div');
+     const indicator = document.createElement('div');
     indicator.className = 'pdf-indicator';
     indicator.style.cssText = `
         display: inline-flex;
