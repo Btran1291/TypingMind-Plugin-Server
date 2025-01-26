@@ -75,7 +75,7 @@ function readFileAsBase64(file) {
 // Store PDF in IndexedDB
 async function storePdfInDatabase(filename, base64String) {
     // Get the current chat ID
-    const chatId = getCurrentChatId();
+    const chatId = await getCurrentChatId();
     
     // Create PDF metadata
     const pdfData = {
@@ -93,10 +93,44 @@ async function storePdfInDatabase(filename, base64String) {
 }
 
 // Get current chat ID from TypingMind
-function getCurrentChatId() {
-    // This is a placeholder - we need to find the actual way TypingMind stores the current chat ID
-    // You might find it in localStorage or window.__NEXT_DATA__
-    return 'chat_' + Date.now();
+async function getCurrentChatId() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('keyval-store', 1);
+
+        request.onerror = () => reject(request.error);
+
+        request.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(['keyval'], 'readonly');
+            const store = transaction.objectStore('keyval');
+
+            // Attempt to find the active chat ID
+            const activeChatRequest = store.get('activeChatId');
+
+            activeChatRequest.onsuccess = () => {
+                const activeChatId = activeChatRequest.result;
+                if (activeChatId) {
+                    resolve(activeChatId);
+                } else {
+                    // If activeChatId is not found, try to get the last chat id
+                    store.getAllKeys().onsuccess = (event) => {
+                        const keys = event.target.result;
+                        if (keys && keys.length > 0) {
+                            // Assuming the last key is the last chat id
+                            const lastKey = keys[keys.length - 1];
+                            if (typeof lastKey === 'string' && lastKey.startsWith('chat_')) {
+                                resolve(lastKey)
+                            } else {
+                                resolve('chat_' + Date.now());
+                            }
+                        } else {
+                             resolve('chat_' + Date.now());
+                        }
+                    }
+                }
+            };
+        };
+    });
 }
 
 // Open/create IndexedDB database
