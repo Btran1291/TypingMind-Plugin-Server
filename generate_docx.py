@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, url_for, make_response, Blueprint
+from flask import Flask, request, jsonify, send_file, url_for, Blueprint
 from flask_cors import CORS
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
@@ -16,7 +16,6 @@ CORS(generate_docx_bp, resources={r"/*": {"origins": "*"}})
 generated_files = {}
 
 def process_core_properties(core_properties_data, core_properties):
-    """Processes and sets core properties of the document."""
     if core_properties_data:
         for prop, value in core_properties_data.items():
             if hasattr(core_properties, prop):
@@ -31,7 +30,6 @@ def process_core_properties(core_properties_data, core_properties):
                     setattr(core_properties, prop, value)
 
 def process_headers_footers(section, headers_data, footers_data):
-    """Processes headers and footers for a given section."""
     def apply_paragraph_formatting(paragraph, format_data):
         if format_data:
             p_format = paragraph.paragraph_format
@@ -81,7 +79,7 @@ def process_headers_footers(section, headers_data, footers_data):
                     else:
                         print(f"Invalid color format: {font_value}. Skipping.")
                 elif font_key == 'size':
-                    font.size = Pt(font_value)  # Set font size explicitly
+                    font.size = Pt(font_value)
                 elif hasattr(font, font_key):
                     setattr(font, font_key, font_value)
 
@@ -95,7 +93,7 @@ def process_headers_footers(section, headers_data, footers_data):
                 header = section.header
 
             if header:
-                header.is_linked_to_previous = False  # Ensure it is not linked to previous
+                header.is_linked_to_previous = False
                 if header.paragraphs:
                     paragraph = header.paragraphs[0]
                     paragraph.text = header_content
@@ -116,7 +114,7 @@ def process_headers_footers(section, headers_data, footers_data):
                 footer = section.footer
 
             if footer:
-                footer.is_linked_to_previous = False  # Ensure it is not linked to previous
+                footer.is_linked_to_previous = False
                 if footer.paragraphs:
                     paragraph = footer.paragraphs[0]
                     paragraph.text = footer_content
@@ -127,37 +125,25 @@ def process_headers_footers(section, headers_data, footers_data):
                 if 'font' in footers_data:
                     apply_font_formatting(paragraph, footers_data['font'])
 
-def process_sections(document, sections_data):
-    """Processes section properties."""
+def process_sections(document, sections_data, default_page_width, default_page_height,
+                     default_left_margin, default_right_margin, default_top_margin,
+                     default_bottom_margin, default_gutter, default_header_distance,
+                     default_footer_distance, default_orientation):
     for section_data in sections_data:
         section = document.add_section(start_type=getattr(WD_SECTION_START, section_data.get('start_type', 'NEW_PAGE'), WD_SECTION_START.NEW_PAGE))
-        if 'orientation' in section_data:
-            section.orientation = getattr(WD_ORIENTATION, section_data['orientation'], WD_ORIENTATION.PORTRAIT)
-        if 'page_width' in section_data:
-            section.page_width = Inches(section_data['page_width'])
-        if 'page_height' in section_data:
-            section.page_height = Inches(section_data['page_height'])
-        if 'left_margin' in section_data:
-            section.left_margin = Inches(section_data['left_margin'])
-        if 'right_margin' in section_data:
-            section.right_margin = Inches(section_data['right_margin'])
-        if 'top_margin' in section_data:
-            section.top_margin = Inches(section_data['top_margin'])
-        if 'bottom_margin' in section_data:
-            section.bottom_margin = Inches(section_data['bottom_margin'])
-        if 'gutter' in section_data:
-            section.gutter = Inches(section_data['gutter'])
-        if 'header_distance' in section_data:
-            section.header_distance = Inches(section_data['header_distance'])
-        if 'footer_distance' in section_data:
-            section.footer_distance = Inches(section_data['footer_distance'])
-        if 'different_first_page_header_footer' in section_data:
-            section.different_first_page_header_footer = section_data['different_first_page_header_footer']
-
+        section.orientation = getattr(WD_ORIENTATION, section_data.get('orientation', default_orientation), WD_ORIENTATION.PORTRAIT)
+        section.page_width = Inches(section_data.get('page_width', default_page_width))
+        section.page_height = Inches(section_data.get('page_height', default_page_height))
+        section.left_margin = Inches(section_data.get('left_margin', default_left_margin))
+        section.right_margin = Inches(section_data.get('right_margin', default_right_margin))
+        section.top_margin = Inches(section_data.get('top_margin', default_top_margin))
+        section.bottom_margin = Inches(section_data.get('bottom_margin', default_bottom_margin))
+        section.gutter = Inches(section_data.get('gutter', default_gutter))
+        section.header_distance = Inches(section_data.get('header_distance', default_header_distance))
+        section.footer_distance = Inches(section_data.get('footer_distance', default_footer_distance))
         process_headers_footers(section, section_data.get('headers'), section_data.get('footers'))
 
 def process_paragraph(document, item):
-    """Processes paragraph content."""
     style_name = item.get('style')
     style = None
     if style_name:
@@ -216,7 +202,7 @@ def process_paragraph(document, item):
                         else:
                             print(f"Invalid color format: {font_value}. Skipping.")
                     elif font_key == 'size':
-                        font.size = Pt(font_value)  # Set font size explicitly
+                        font.size = Pt(font_value)
                     elif hasattr(font, font_key):
                         setattr(font, font_key, font_value)
             if 'bold' in run_data:
@@ -227,7 +213,6 @@ def process_paragraph(document, item):
                 run.underline = getattr(WD_UNDERLINE, run_data['underline'], WD_UNDERLINE.NONE)
 
 def process_table(document, item):
-    """Processes table content."""
     rows = item.get('rows', 1)
     cols = item.get('cols', 1)
     style_name = item.get('style')
@@ -253,16 +238,11 @@ def process_table(document, item):
                     cell.vertical_alignment = getattr(WD_CELL_VERTICAL_ALIGNMENT, item['vertical_alignment'], WD_CELL_VERTICAL_ALIGNMENT.TOP)
 
 def process_image(document, item):
-    """Processes image content."""
     try:
-        headers = {
-                    "User-Agent": "Docx_Generator_bot/1.0 requests/{requests.__version__}"
-                  }
-
+        headers = {"User-Agent": f"Docx_Generator_bot/1.0 requests/{requests.__version__}"}
         response = requests.get(item['url'], headers=headers, stream=True)
         response.raise_for_status()
         image_stream = io.BytesIO(response.content)
-
         paragraph = document.add_paragraph()
         run = paragraph.add_run()
         width = Inches(item.get('width', 3))
@@ -281,16 +261,41 @@ def generate_docx():
         if not data:
             return jsonify({'error': 'Invalid input. Must provide document parameters.'}), 400
 
+        default_page_width = data.get('defaultPageWidth', 8.5)
+        default_page_height = data.get('defaultPageHeight', 11)
+        default_left_margin = data.get('defaultLeftMargin', 1)
+        default_right_margin = data.get('defaultRightMargin', 1)
+        default_top_margin = data.get('defaultTopMargin', 1)
+        default_bottom_margin = data.get('defaultBottomMargin', 1)
+        default_gutter = data.get('defaultGutter', 0)
+        default_header_distance = data.get('defaultHeaderDistance', 0.5)
+        default_footer_distance = data.get('defaultFooterDistance', 0.5)
+        default_orientation = data.get('defaultOrientation', "PORTRAIT")
+        enable_core_properties = data.get('enableCoreProperties', "false") == "true"
+        core_properties_title = data.get('corePropertiesTitle', "")
+        core_properties_author = data.get('corePropertiesAuthor', "")
+        core_properties_created = data.get('corePropertiesCreated', "")
+        odd_and_even_pages_header_footer = data.get('oddAndEvenPagesHeaderFooter', "false") == "true"
+
         document = Document()
-
         settings = document.settings
-        if 'odd_and_even_pages_header_footer' in data:
-            settings.odd_and_even_pages_header_footer = data['odd_and_even_pages_header_footer']
+        settings.odd_and_even_pages_header_footer = odd_and_even_pages_header_footer
 
-        core_properties = document.core_properties
-        process_core_properties(data.get('core_properties'), core_properties)
+        if enable_core_properties:
+            core_properties = document.core_properties
+            core_properties_data = {}
+            if core_properties_title:
+                core_properties_data['title'] = core_properties_title
+            if core_properties_author:
+                core_properties_data['author'] = core_properties_author
+            if core_properties_created:
+                core_properties_data['created'] = core_properties_created
+            process_core_properties(core_properties_data, core_properties)
 
-        process_sections(document, data.get('sections', []))
+        process_sections(document, data.get('sections', []), default_page_width, default_page_height,
+                         default_left_margin, default_right_margin, default_top_margin,
+                         default_bottom_margin, default_gutter, default_header_distance,
+                         default_footer_distance, default_orientation)
 
         content = data.get('content', [])
         for item in content:
@@ -308,6 +313,7 @@ def generate_docx():
                     document.add_paragraph(list_item, style=list_style)
             elif item['type'] == 'page_break':
                 document.add_page_break()
+
         buffer = io.BytesIO()
         document.save(buffer)
         buffer.seek(0)
