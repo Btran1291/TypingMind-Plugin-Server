@@ -16,12 +16,10 @@ def vectorize_rag_retrieve():
         return response
 
     try:
-        # Ensure JSON data is provided
         data = request.get_json()
         if not data:
             return jsonify({'error': 'No JSON data provided'}), 400
         
-        # Extract parameters from the request
         access_token = data.get('accessToken')
         retrieval_endpoint_url = data.get('retrievalEndpointURL')
         question = data.get('question')
@@ -48,7 +46,6 @@ def vectorize_rag_retrieve():
         if not question:
             return jsonify({'error': 'Search query is required'}), 400
         
-        # Prepare request to Vectorize
         vectorize_payload = {
             "question": question,
             "numResults": num_results,
@@ -65,13 +62,11 @@ def vectorize_rag_retrieve():
             json=vectorize_payload
         )
         
-        # Check if Vectorize request was successful
         if not vectorize_response.ok:
             return jsonify({
                 "error": f"Vectorize API error: {vectorize_response.text}"
             }), vectorize_response.status_code
         
-        # Return the Vectorize response
         return jsonify(vectorize_response.json())
     
     except requests.exceptions.RequestException as e:
