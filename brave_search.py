@@ -31,14 +31,11 @@ def brave_search():
             return jsonify({'error': 'Search query is required'}), 400
 
         def is_valid_param(param):
-            # Return False for None or empty values
             if param is None:
                 return False
                 
-            # Convert to string for checking
             param_str = str(param)
             
-            # Return False for empty strings or template literals
             if (param_str.strip() == "" or 
                 param_str.startswith("{") or 
                 param_str.endswith("}") or
@@ -48,12 +45,10 @@ def brave_search():
                 
             return True
 
-        # Start with only the required parameter
         params = {
             'q': query,
         }
 
-        # Define optional parameters mapping
         param_mapping = {
             'offset': ('offset', data.get('offset')),
             'freshness': ('freshness', data.get('freshness')),
@@ -66,7 +61,6 @@ def brave_search():
             'units': ('units', data.get('units'))
         }
 
-        # Only add parameters that have valid values
         for api_param, (param_name, value) in param_mapping.items():
             if is_valid_param(value):
                 # Convert to integer for numeric parameters
