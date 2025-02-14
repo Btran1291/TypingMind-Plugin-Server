@@ -232,10 +232,13 @@ def process_table(document, item):
     if 'autofit' in item:
         table.autofit = item['autofit']
     if 'data' in item:
-        for row_idx, row_data in enumerate(item['data']):
-            for col_idx, cell_data in enumerate(row_data):
+        num_rows = min(rows, len(item['data']))
+        for row_idx in range(num_rows):
+            row_data = item['data'][row_idx]
+            num_cols = min(cols, len(row_data))
+            for col_idx in range(num_cols):
                 cell = table.cell(row_idx, col_idx)
-                cell.text = str(cell_data)
+                cell.text = str(row_data[col_idx])
                 if 'vertical_alignment' in item:
                     cell.vertical_alignment = getattr(WD_CELL_VERTICAL_ALIGNMENT, item['vertical_alignment'], WD_CELL_VERTICAL_ALIGNMENT.TOP)
 
