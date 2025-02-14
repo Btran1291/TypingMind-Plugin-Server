@@ -3,7 +3,7 @@
 This repository contains the backend server code for some of my TypingMind plugins. Currently, it contains the following plugins:
 1. [Brave Search](https://cloud.typingmind.com/plugins/p-01JJD655P2QCGCG3MGBQ50RCSV)
 2. [Vectorize Query](https://cloud.typingmind.com/plugins/p-01JJD662KCM4X901JRQRF8DG6F)
-3. [DOCX Generator](https://cloud.typingmind.com/plugins/p-01JJCGQ73XE44DEVE3K2TMKBFZ)
+3. [DOCX Generator](https://cloud.typingmind.com/plugins/p-01JM2R9TM8GVJJGAKGWAN1YR8E)
 
 ## How to deploy to Render.com
 
