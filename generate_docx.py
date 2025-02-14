@@ -67,7 +67,9 @@ def process_headers_footers(section, headers_data, footers_data):
                         )
     def apply_font_formatting(paragraph, font_data):
         if font_data:
-            font = paragraph.runs[0].font if paragraph.runs else paragraph.add_run().font
+            if not paragraph.runs:
+                paragraph.add_run()
+            font = paragraph.runs[0].font
             for font_key, font_value in font_data.items():
                 if font_key == 'color':
                     if isinstance(font_value, str) and font_value.startswith('#'):
@@ -102,7 +104,7 @@ def process_headers_footers(section, headers_data, footers_data):
 
                 apply_paragraph_formatting(paragraph, headers_data.get('paragraph_format'))
                 if 'font' in headers_data:
-                    apply_font_formatting(paragraph, headers_data['font'])
+                    apply_font_formatting(paragraph, paragraph)
 
     if footers_data:
         for footer_type, footer_content in footers_data.items():
@@ -119,11 +121,11 @@ def process_headers_footers(section, headers_data, footers_data):
                     paragraph = footer.paragraphs[0]
                     paragraph.text = footer_content
                 else:
-                    paragraph = footer.add_paragraph(footer_content)
+                    paragraph = header.add_paragraph(header_content)
                 if 'paragraph_format' in footers_data:
                     apply_paragraph_formatting(paragraph, footers_data['paragraph_format'])
                 if 'font' in footers_data:
-                    apply_font_formatting(paragraph, footers_data['font'])
+                    apply_font_formatting(paragraph, paragraph)
 
 def process_sections(document, sections_data, default_page_width, default_page_height,
                      default_left_margin, default_right_margin, default_top_margin,
