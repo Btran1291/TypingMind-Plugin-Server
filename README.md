@@ -30,3 +30,5 @@ This repository contains the backend server code for some of my TypingMind plugi
 5.  **Access Your Deployed Application:**
     *   Once the deployment is complete, Render will provide a URL for your deployed application.
     *   You can use this URL in your TypingMind plugin settings.
+
+*Note: This was written with personal use in mind and does not handle concurrency well. If you are a business user who might have multiple customers using the plugins at the same time, remember to set up a higher number of gunicorn workers and threads for better concurrency performance.*
